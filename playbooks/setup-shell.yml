@@ -1,0 +1,6 @@
+# ansible-playbook -i $HOST, playbooks/setup-shell.yml -u $USER
+- name: Setup user shell
+  hosts: all
+  tasks:
+    - name: Update bashrc
+      template: src=../templates/.bashrc dest=~/.bashrc
