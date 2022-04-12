@@ -2,8 +2,9 @@
 - name: Setup user login
   hosts: all
   become: true
-  become_method: su
-  become_user: root
+  # Use if sudo not installed
+  # become_method: su
+  # become_user: root
   tasks:
     - name: Install sudo
       apt:
