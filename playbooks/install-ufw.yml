@@ -1,0 +1,40 @@
+# ansible-playbook -i $HOST, playbooks/install-ufw.yml -u $USER
+- name: Install ufw
+  hosts: all
+  become: true
+  tasks:
+    - name: Install ufw
+      apt:
+        update_cache: yes
+        name: "ufw"
+
+    - name: Allow SSH
+      ufw:
+        rule: allow
+        proto: tcp
+        port: 22
+
+    - name: Allow HTTP
+      ufw:
+        route: yes
+        rule: allow
+        proto: tcp
+        port: 80
+
+    - name: Allow HTTPS
+      ufw:
+        route: yes
+        rule: allow
+        proto: tcp
+        port: 443
+
+    - name: Add docker rules to after.rules
+      blockinfile:
+        block: "{{ lookup('file', '../templates/ufw-after.rules') }}"
+        path: /etc/ufw/after.rules
+        insertbefore: "'COMMIT'"
+        backup: yes
+
+    - name: Reload and enable ufw
+      ufw:
+        state: enabled
