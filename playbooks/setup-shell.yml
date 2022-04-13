@@ -4,3 +4,20 @@
   tasks:
     - name: Update bashrc
       template: src=../templates/.bashrc dest=~/.bashrc
+
+    - name: Install packages
+      become: true
+      apt:
+        name:
+          - htop
+          - nmon
+          - mtr
+        update_cache: yes
+
+    - name: Create htop config directory
+      file:
+        path: ~/.config/htop
+        state: directory
+
+    - name: Add htop config
+      template: src=../templates/htoprc dest=~/.config/htop/htoprc
