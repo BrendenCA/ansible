@@ -35,6 +35,11 @@
         insertbefore: "'COMMIT'"
         backup: yes
 
+    - name: Allow container to host
+      ufw:
+        rule: allow
+        to_ip: 172.17.0.1
+
     - name: Reload and enable ufw
       ufw:
         state: enabled
