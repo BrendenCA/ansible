@@ -1,0 +1,10 @@
+# ansible-galaxy install geerlingguy.helm
+# ansible-playbook -i $HOST, playbooks/install-helm.yml -u $USER
+- name: Install helm
+  hosts: k3s_master
+  vars:
+    helm_version: "v3.8.2"
+    helm_platform: "{{ansible_system | lower}}"
+    helm_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+  roles:
+    - role: geerlingguy.helm
