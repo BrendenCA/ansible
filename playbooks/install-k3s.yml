@@ -1,0 +1,57 @@
+# ansible-galaxy install xanmanning.k3s
+# ansible-playbook -i inventory/hosts.ini playbooks/install-k3s.yml
+- name: Install k3s
+  hosts: all
+  pre_tasks:
+    - name: Setup firewall
+      become: true
+      block:
+        - name: Remove oracle iptable rules
+          file:
+            state: absent
+            path: /etc/iptables
+          register: iptables_removed
+
+        - name: Install ufw
+          apt:
+            update_cache: yes
+            name: "ufw"
+
+        - name: Allow SSH
+          ufw:
+            rule: allow
+            proto: tcp
+            port: 22
+
+        - name: Allow HTTP
+          ufw:
+            rule: allow
+            proto: tcp
+            port: 80
+          when:
+            - k3s_control_node is defined
+
+        - name: Allow HTTPS
+          ufw:
+            rule: allow
+            proto: tcp
+            port: 443
+          when:
+            - k3s_control_node is defined
+
+        - name: Allow IN from k3s node subnet
+          ufw:
+            rule: allow
+            src: "{{ k3s_node_subnet }}"
+
+        - name: Reload and enable ufw
+          ufw:
+            state: enabled
+
+        - name: Flush iptables and reboot
+          reboot:
+            reboot_command: iptables -F && reboot now
+          when: iptables_removed.changed
+
+  roles:
+    - xanmanning.k3s
